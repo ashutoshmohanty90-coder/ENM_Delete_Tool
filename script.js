@@ -1,54 +1,84 @@
-function generateCommands(){
+function showTab(tabId){
 
-    let site = document.getElementById("siteId").value;
+    let tabs = document.querySelectorAll(".tab-content");
+
+    tabs.forEach(tab => {
+        tab.classList.remove("active");
+    });
+
+    document.getElementById(tabId).classList.add("active");
+
+    let buttons = document.querySelectorAll(".tab-btn");
+
+    buttons.forEach(btn => {
+        btn.classList.remove("active");
+    });
+
+    event.target.classList.add("active");
+}
+
+/* ENM DELETE */
+
+function generateENM(){
+
+    let site = document.getElementById("enmSite").value;
 
     let commands = `
-cmedit get *XXXX* FmAlarmsupervision.* ; Inventorysupervision.* ; pmFunction.*;cmNodeHeartbeatsupervision.*; cmFunction.* -t
+cmedit get *XXXX* FmAlarmsupervision.*
 
 cmedit set NetworkElement=XXXX,CmNodeHeartbeatSupervision=1 active=false
 
-cmedit set NetworkElement=XXXX,InventorySupervision=1 active=false
-
-fmedit set XXXX FmAlarmSupervision alarmSupervisionState=false
-
-cmedit set NetworkElement=XXXX,PmFunction=1 pmEnabled=false
-
-cmedit action NetworkElement=XXXX,CmFunction=1 deleteNrmDataFromEnm
-
-cmedit delete NetworkElement=XXXX –ALL --force
-
-cmedit get NetworkElement=XXXX
-
-ap order -nv file:XXXX.zip
+cmedit delete NetworkElement=XXXX --ALL --force
 
 ap status -n XXXX
 `;
 
     commands = commands.replaceAll("XXXX", site);
 
-    document.getElementById("output").innerText = commands;
+    document.getElementById("enmOutput").innerText = commands;
 }
 
-function copyCommands(){
+/* CBRS */
 
-    let text = document.getElementById("output").innerText;
+function generateCBRS(){
+
+    let site = document.getElementById("cbrsSite").value;
+
+    let commands = `
+cbrs remove XXXX
+
+cbrs status XXXX
+`;
+
+    commands = commands.replaceAll("XXXX", site);
+
+    document.getElementById("cbrsOutput").innerText = commands;
+}
+
+/* BACKUP */
+
+function generateBackup(){
+
+    let site = document.getElementById("backupSite").value;
+
+    let commands = `
+backup create XXXX
+
+backup verify XXXX
+`;
+
+    commands = commands.replaceAll("XXXX", site);
+
+    document.getElementById("backupOutput").innerText = commands;
+}
+
+/* COPY */
+
+function copyOutput(id){
+
+    let text = document.getElementById(id).innerText;
 
     navigator.clipboard.writeText(text);
 
     alert("Commands Copied!");
-}
-
-function downloadTxt(){
-
-    let text = document.getElementById("output").innerText;
-
-    let blob = new Blob([text], {type:"text/plain"});
-
-    let a = document.createElement("a");
-
-    a.href = URL.createObjectURL(blob);
-
-    a.download = "ENM_Delete_Commands.txt";
-
-    a.click();
 }
