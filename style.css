@@ -1,36 +1,68 @@
 body{
-    background:#0b1020;
-    color:white;
+    margin:0;
     font-family:Arial;
-    padding:40px;
+    background:#050816;
+    color:white;
 }
 
 .container{
-    max-width:1000px;
+    max-width:1200px;
     margin:auto;
+    padding:30px;
+}
+
+h1{
+    text-align:center;
+    color:#00d4ff;
+    margin-bottom:40px;
+}
+
+.tabs{
+    display:flex;
+    gap:10px;
+    margin-bottom:30px;
+    flex-wrap:wrap;
+}
+
+.tab-btn{
+    padding:12px 20px;
+    border:none;
+    border-radius:10px;
+    background:#111827;
+    color:white;
+    cursor:pointer;
+    font-weight:bold;
+}
+
+.tab-btn.active{
+    background:#00d4ff;
+    color:black;
+}
+
+.tab-content{
+    display:none;
     background:#111827;
     padding:30px;
     border-radius:15px;
 }
 
-h1{
-    color:#00d4ff;
+.tab-content.active{
+    display:block;
 }
 
 input{
     width:100%;
     padding:15px;
     margin-top:20px;
+    margin-bottom:20px;
     background:#0f172a;
     border:1px solid #334155;
-    color:white;
     border-radius:10px;
+    color:white;
     font-size:16px;
 }
 
 button{
-    margin-top:20px;
-    margin-right:10px;
     padding:12px 20px;
     border:none;
     border-radius:10px;
@@ -38,17 +70,14 @@ button{
     color:black;
     font-weight:bold;
     cursor:pointer;
-}
-
-button:hover{
-    opacity:0.8;
+    margin-right:10px;
 }
 
 pre{
-    margin-top:30px;
     background:black;
+    color:#00ff88;
     padding:20px;
     border-radius:10px;
-    color:#00ff88;
+    margin-top:20px;
     white-space:pre-wrap;
 }

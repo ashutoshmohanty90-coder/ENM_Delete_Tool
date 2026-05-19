@@ -1,8 +1,11 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
-    <title>ENM Delete Command Generator</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TMO_USA Command Generator Suite</title>
+
     <link rel="stylesheet" href="style.css">
 </head>
 
@@ -10,17 +13,83 @@
 
     <div class="container">
 
-        <h1>ENM Delete Command Generator</h1>
+        <h1>TMO_USA Command Generator Suite</h1>
 
-        <input type="text" id="siteId" placeholder="Enter Site ID">
+        <div class="tabs">
 
-        <button onclick="generateCommands()">Generate Commands</button>
+            <button class="tab-btn active" onclick="showTab('enm')">
+                ENM Delete
+            </button>
 
-        <button onclick="copyCommands()">Copy</button>
+            <button class="tab-btn" onclick="showTab('cbrs')">
+                CBRS Remove
+            </button>
 
-        <button onclick="downloadTxt()">Download TXT</button>
+            <button class="tab-btn" onclick="showTab('backup')">
+                Backup
+            </button>
 
-        <pre id="output"></pre>
+        </div>
+
+        <!-- ENM DELETE TAB -->
+
+        <div id="enm" class="tab-content active">
+
+            <h2>ENM Delete Commands</h2>
+
+            <input type="text" id="enmSite" placeholder="Enter Site ID">
+
+            <button onclick="generateENM()">
+                Generate
+            </button>
+
+            <button onclick="copyOutput('enmOutput')">
+                Copy
+            </button>
+
+            <pre id="enmOutput"></pre>
+
+        </div>
+
+        <!-- CBRS TAB -->
+
+        <div id="cbrs" class="tab-content">
+
+            <h2>CBRS Remove Commands</h2>
+
+            <input type="text" id="cbrsSite" placeholder="Enter Site ID">
+
+            <button onclick="generateCBRS()">
+                Generate
+            </button>
+
+            <button onclick="copyOutput('cbrsOutput')">
+                Copy
+            </button>
+
+            <pre id="cbrsOutput"></pre>
+
+        </div>
+
+        <!-- BACKUP TAB -->
+
+        <div id="backup" class="tab-content">
+
+            <h2>Backup Commands</h2>
+
+            <input type="text" id="backupSite" placeholder="Enter Site ID">
+
+            <button onclick="generateBackup()">
+                Generate
+            </button>
+
+            <button onclick="copyOutput('backupOutput')">
+                Copy
+            </button>
+
+            <pre id="backupOutput"></pre>
+
+        </div>
 
     </div>
 
