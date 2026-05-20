@@ -21,7 +21,6 @@ h1{
     display:flex;
     gap:10px;
     margin-bottom:30px;
-    flex-wrap:wrap;
 }
 
 .tab-btn{
@@ -30,8 +29,8 @@ h1{
     border-radius:10px;
     background:#111827;
     color:white;
-    cursor:pointer;
     font-weight:bold;
+    cursor:pointer;
 }
 
 .tab-btn.active{
@@ -53,7 +52,7 @@ h1{
 input{
     width:100%;
     padding:15px;
-    margin-top:20px;
+    margin-top:15px;
     margin-bottom:20px;
     background:#0f172a;
     border:1px solid #334155;
@@ -74,10 +73,10 @@ button{
 }
 
 pre{
+    margin-top:20px;
     background:black;
-    color:#00ff88;
     padding:20px;
     border-radius:10px;
-    margin-top:20px;
+    color:#00ff88;
     white-space:pre-wrap;
 }

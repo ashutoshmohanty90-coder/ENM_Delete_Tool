@@ -4,97 +4,84 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TMO_USA Command Generator Suite</title>
+
+    <title>TMO USA Command Portal</title>
 
     <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
-    <div class="container">
+<div class="container">
 
-        <h1>TMO_USA Command Generator Suite</h1>
+    <h1>TMO USA Command Portal</h1>
 
-        <div class="tabs">
+    <div class="tabs">
 
-            <button class="tab-btn active" onclick="showTab('enm')">
-                ENM Delete
-            </button>
+        <button class="tab-btn active" onclick="showTab('deleteTab')">
+            ENM Delete
+        </button>
 
-            <button class="tab-btn" onclick="showTab('cbrs')">
-                CBRS Remove
-            </button>
-
-            <button class="tab-btn" onclick="showTab('backup')">
-                Backup
-            </button>
-
-        </div>
-
-        <!-- ENM DELETE TAB -->
-
-        <div id="enm" class="tab-content active">
-
-            <h2>ENM Delete Commands</h2>
-
-            <input type="text" id="enmSite" placeholder="Enter Site ID">
-
-            <button onclick="generateENM()">
-                Generate
-            </button>
-
-            <button onclick="copyOutput('enmOutput')">
-                Copy
-            </button>
-
-            <pre id="enmOutput"></pre>
-
-        </div>
-
-        <!-- CBRS TAB -->
-
-        <div id="cbrs" class="tab-content">
-
-            <h2>CBRS Remove Commands</h2>
-
-            <input type="text" id="cbrsSite" placeholder="Enter Site ID">
-
-            <button onclick="generateCBRS()">
-                Generate
-            </button>
-
-            <button onclick="copyOutput('cbrsOutput')">
-                Copy
-            </button>
-
-            <pre id="cbrsOutput"></pre>
-
-        </div>
-
-        <!-- BACKUP TAB -->
-
-        <div id="backup" class="tab-content">
-
-            <h2>Backup Commands</h2>
-
-            <input type="text" id="backupSite" placeholder="Enter Site ID">
-
-            <button onclick="generateBackup()">
-                Generate
-            </button>
-
-            <button onclick="copyOutput('backupOutput')">
-                Copy
-            </button>
-
-            <pre id="backupOutput"></pre>
-
-        </div>
+        <button class="tab-btn" onclick="showTab('addTab')">
+            ENM Add
+        </button>
 
     </div>
 
-    <script src="script.js"></script>
+    <!-- ENM DELETE -->
+
+    <div id="deleteTab" class="tab-content active">
+
+        <h2>ENM Node Delete</h2>
+
+        <input type="text" id="deleteSite"
+        placeholder="Enter Site ID">
+
+        <button onclick="generateDelete()">
+            Generate Commands
+        </button>
+
+        <button onclick="copyOutput('deleteOutput')">
+            Copy
+        </button>
+
+        <pre id="deleteOutput"></pre>
+
+    </div>
+
+    <!-- ENM ADD -->
+
+    <div id="addTab" class="tab-content">
+
+        <h2>ENM Node Add</h2>
+
+        <input type="text"
+        id="addSite"
+        placeholder="Enter Site ID">
+
+        <input type="text"
+        id="ipAddress"
+        placeholder="Enter IP Address">
+
+        <input type="text"
+        id="timeZone"
+        placeholder="Enter Time Zone">
+
+        <button onclick="generateAdd()">
+            Generate Commands
+        </button>
+
+        <button onclick="copyOutput('addOutput')">
+            Copy
+        </button>
+
+        <pre id="addOutput"></pre>
+
+    </div>
+
+</div>
+
+<script src="script.js"></script>
 
 </body>
-
 </html>
