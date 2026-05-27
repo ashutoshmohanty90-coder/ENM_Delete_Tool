@@ -434,6 +434,8 @@ cmedit set NetworkElement=${site},PmFunction=1 pmEnabled=true
 /* =========================
 CORRECT RI MAPPING
 ========================= */
+<!-- REPLACE ONLY generateMapping() FUNCTION -->
+
 function generateMapping(){
 
     let pre1 =
@@ -467,7 +469,7 @@ function generateMapping(){
 
 
         /* =========================
-        GET BASEBAND NAME
+        DETECT BASEBAND
         Example:
         FieldReplaceableUnit=1 Baseband 6630
         ========================= */
@@ -497,7 +499,7 @@ function generateMapping(){
 
 
         /* =========================
-        GET RI LINKS
+        DETECT RI LINKS
         ========================= */
 
         lines.forEach(line => {
@@ -505,13 +507,8 @@ function generateMapping(){
             if(
                 line.includes("RiLink=")
                 &&
-                line.includes("FieldReplaceableUnit=")
+                line.includes("RiPort=")
             ){
-
-                let ref1 =
-                line.match(
-/FieldReplaceableUnit=([^,]+),RiPort=([A-Z0-9]+)/i
-                );
 
                 let allRefs =
                 [...line.matchAll(
@@ -522,11 +519,21 @@ function generateMapping(){
 
                 if(allRefs.length >= 2){
 
+                    /* =========================
+                    riPortRef1
+                    ========================= */
+
                     let ref1Unit =
                     allRefs[0][1];
 
                     let ref1Port =
                     allRefs[0][2];
+
+
+
+                    /* =========================
+                    riPortRef2
+                    ========================= */
 
                     let ref2Unit =
                     allRefs[1][1];
@@ -552,6 +559,7 @@ function generateMapping(){
 
                         ref2Port:
                         ref2Port
+
                     });
                 }
             }
@@ -615,10 +623,11 @@ function generateMapping(){
         if(matched){
 
             output +=
-`Pre ${pre.baseband} RiPort=${pre.ref1Port} (${pre.ref2Unit}/${pre.ref2Port})
- ---> Post ${matched.baseband} RiPort=${matched.ref1Port} (${matched.ref2Unit}/${matched.ref2Port})
+`Pre ${pre.baseband} RiPort=${pre.ref1Port}
+ ---> Post ${matched.baseband} RiPort=${matched.ref1Port}
 
 `;
+
         }
 
     });
