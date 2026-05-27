@@ -431,7 +431,7 @@ cmedit set NetworkElement=${site},PmFunction=1 pmEnabled=true
 
 /* =========================
 FINAL ERICSSON RI MAPPING
-CORRECT BB / XMU LOGIC
+SERIAL NUMBER VERSION
 ========================= */
 
 function generateMapping(){
@@ -484,15 +484,15 @@ function generateMapping(){
                 /*
                 Examples:
 
-                FieldReplaceableUnit=1 Baseband 6648
-                FieldReplaceableUnit=1 Baseband 5216
-                FieldReplaceableUnit=BB-01 Baseband 6630
+                FieldReplaceableUnit=1         Baseband 6648
+                FieldReplaceableUnit=1         Baseband 5216
+                FieldReplaceableUnit=BB-01     Baseband 6630
                 FieldReplaceableUnit=XMU03-1-7 Baseband R503
                 */
 
                 let match =
                 line.match(
-/FieldReplaceableUnit=([A-Z0-9\-]+)\s+Baseband\s+([A-Z0-9 ]+)/i
+/FieldReplaceableUnit=([A-Z0-9\-]+)\s+Baseband\s+([A-Z0-9 ]+)\s+KDU[0-9 \/A-Z]+\s+[A-Z0-9\/]+\s+[0-9]+\s+([A-Z0-9]+)/i
                 );
 
 
@@ -503,10 +503,19 @@ function generateMapping(){
                     match[1]
                     .trim();
 
-                    let bb =
-                    `Baseband ${match[2]
+                    let productName =
+                    match[2]
                     .trim()
-                    .replace(/\s+/g,' ')}`;
+                    .replace(/\s+/g,' ');
+
+                    let serialNumber =
+                    match[3]
+                    .trim();
+
+
+
+                    let bb =
+                    `Baseband ${productName} ${serialNumber}`;
 
                     fruMap[fru] = bb;
                 }
