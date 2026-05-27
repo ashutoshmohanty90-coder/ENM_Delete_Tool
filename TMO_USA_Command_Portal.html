@@ -430,11 +430,9 @@ cmedit set NetworkElement=${site},PmFunction=1 pmEnabled=true
 
 
 
-
 /* =========================
 CORRECT RI MAPPING
 ========================= */
-<!-- REPLACE ONLY generateMapping() FUNCTION -->
 
 function generateMapping(){
 
@@ -470,27 +468,32 @@ function generateMapping(){
 
         /* =========================
         DETECT BASEBAND
-        Example:
-        FieldReplaceableUnit=1 Baseband 6630
+        Supports:
+        FieldReplaceableUnit=1
+        FieldReplaceableUnit=BB-01
         ========================= */
 
         lines.forEach(line => {
 
-            if(
-                line.includes("FieldReplaceableUnit=1")
-                &&
-                line.includes("Baseband")
-            ){
+            if(line.includes("Baseband")){
 
                 let bbMatch =
-                line.match(/Baseband\s+[A-Z0-9\- ]+/i);
+                line.match(
+/FieldReplaceableUnit=[^ ]+\s+Baseband\s+[A-Z0-9\-\/ ]+/i
+                );
 
                 if(bbMatch){
 
-                    currentBaseband =
+                    let clean =
                     bbMatch[0]
+                    .replace(
+/FieldReplaceableUnit=[^ ]+\s+/i,
+''
+                    )
                     .replace(/\s+/g,' ')
                     .trim();
+
+                    currentBaseband = clean;
                 }
             }
 
@@ -623,8 +626,7 @@ function generateMapping(){
         if(matched){
 
             output +=
-`Pre ${pre.baseband} RiPort=${pre.ref1Port}
- ---> Post ${matched.baseband} RiPort=${matched.ref1Port}
+`Pre ${pre.baseband} RiPort=${pre.ref1Port} (${pre.ref2Unit}/${pre.ref2Port}) ---> Post ${matched.baseband} RiPort=${matched.ref1Port} (${matched.ref2Unit}/${matched.ref2Port})
 
 `;
 
@@ -641,7 +643,6 @@ function generateMapping(){
     document.getElementById("mappingOutput")
     .innerText = output;
 }
-
 
 /* =========================
 RADIO SWAP
