@@ -428,9 +428,10 @@ cmedit set NetworkElement=${site},PmFunction=1 pmEnabled=true
     .innerText = commands;
 }
 
+
 /* =========================
-FINAL DYNAMIC ERICSSON
-RI PORT MAPPING LOGIC
+FINAL ERICSSON RI MAPPING
+CORRECT BB / XMU LOGIC
 ========================= */
 
 function generateMapping(){
@@ -561,13 +562,62 @@ function generateMapping(){
 
 
 
-                    /*
-                    Dynamic Display Name
-                    */
+                    /* =========================
+                    CORRECT BB/XMU LOGIC
+                    ========================= */
 
-                    let displayName =
-                    fruMap[ref1Unit]
-                    || ref1Unit;
+                    let displayName = ref1Unit;
+
+
+
+                    /* =========================
+                    MAIN BB PORTS
+                    A,B,C,D,E,F,G,H...
+                    ========================= */
+
+                    if(
+                        /^[A-Z]$/.test(ref1Port)
+                    ){
+
+                        /*
+                        Main BB always FRU=1
+                        */
+
+                        if(fruMap["1"]){
+
+                            displayName =
+                            fruMap["1"];
+                        }
+                    }
+
+
+
+                    /* =========================
+                    XMU / R503
+                    Numeric Ports
+                    ========================= */
+
+                    else if(
+                        ref1Unit.includes("XMU")
+                    ){
+
+                        displayName =
+                        fruMap[ref1Unit]
+                        || ref1Unit;
+                    }
+
+
+
+                    /* =========================
+                    NORMAL BB
+                    ========================= */
+
+                    else{
+
+                        displayName =
+                        fruMap[ref1Unit]
+                        || ref1Unit;
+                    }
 
 
 
