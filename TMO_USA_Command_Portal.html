@@ -432,7 +432,7 @@ cmedit set NetworkElement=${site},PmFunction=1 pmEnabled=true
 
 
 /* =========================
-RI MAPPING
+CORRECT RI MAPPING
 ========================= */
 
 function generateMapping(){
@@ -453,13 +453,13 @@ function generateMapping(){
 
 
 
-    function extractMappings(text){
+    function parseData(text){
 
         let lines = text.split('\n');
 
-        let mappings = [];
-
         let currentBB = "";
+
+        let mappings = [];
 
         lines.forEach(line => {
 
@@ -480,35 +480,44 @@ function generateMapping(){
             }
 
 
+
             /* Detect RiLink */
 
             if(line.includes("RiLink=")
-            && line.includes("RiPort=")){
+            && line.includes("FieldReplaceableUnit")){
 
-                let ports =
-                [...line.matchAll(/RiPort=([A-Z0-9]+)/g)];
+                let refs =
+                [...line.matchAll(/FieldReplaceableUnit=([^,]+),RiPort=([A-Z0-9_]+)/g)];
 
-                let units =
-                [...line.matchAll(/FieldReplaceableUnit=([^,]+)/g)];
+                if(refs.length >= 2){
 
-                if(ports.length >= 2){
+                    let riPortRef1_Unit =
+                    refs[0][1];
 
-                    let prePort =
-                    ports[0][1];
+                    let riPortRef1_Port =
+                    refs[0][2];
 
-                    let postPort =
-                    ports[1][1];
+                    let riPortRef2_Unit =
+                    refs[1][1];
 
-                    let postUnit =
-                    units.length >= 2
-                    ? units[1][1]
-                    : "Unknown";
+                    let riPortRef2_Port =
+                    refs[1][2];
 
                     mappings.push({
+
                         baseband: currentBB,
-                        prePort: prePort,
-                        postUnit: postUnit,
-                        postPort: postPort
+
+                        ref1Unit:
+                        riPortRef1_Unit,
+
+                        ref1Port:
+                        riPortRef1_Port,
+
+                        ref2Unit:
+                        riPortRef2_Unit,
+
+                        ref2Port:
+                        riPortRef2_Port
                     });
                 }
             }
@@ -523,34 +532,41 @@ function generateMapping(){
     let preMappings = [];
 
     preMappings =
-    preMappings.concat(extractMappings(pre1));
+    preMappings.concat(parseData(pre1));
 
     preMappings =
-    preMappings.concat(extractMappings(pre2));
+    preMappings.concat(parseData(pre2));
 
     if(pre3.trim().toUpperCase() !== "NA"){
 
         preMappings =
-        preMappings.concat(extractMappings(pre3));
+        preMappings.concat(parseData(pre3));
     }
 
 
     let postMappings =
-    extractMappings(post);
+    parseData(post);
+
 
 
 
     preMappings.forEach(pre => {
 
-        let match =
+        let matched =
         postMappings.find(postMap =>
-            postMap.postUnit === pre.postUnit
+
+            postMap.ref2Unit === pre.ref2Unit
+            &&
+
+            postMap.ref2Port === pre.ref2Port
         );
 
-        if(match){
+
+
+        if(matched){
 
             output +=
-`Pre ${pre.baseband} RiPort=${pre.prePort} ---> Post ${match.baseband} ${match.postUnit},RiPort=${match.postPort}
+`Pre ${pre.baseband} RiPort=${pre.ref1Port} ---> Post ${matched.baseband} RiPort=${matched.ref1Port}
 
 `;
         }
