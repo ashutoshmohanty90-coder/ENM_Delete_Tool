@@ -429,9 +429,9 @@ cmedit set NetworkElement=${site},PmFunction=1 pmEnabled=true
 }
 
 
-
 /* =========================
 CORRECT RI MAPPING
+FINAL VERSION
 ========================= */
 
 function generateMapping(){
@@ -626,9 +626,7 @@ function generateMapping(){
         if(matched){
 
             output +=
-`Pre ${pre.baseband} RiPort=${pre.ref1Port} (${pre.ref2Unit}/${pre.ref2Port}) ---> Post ${matched.baseband} RiPort=${matched.ref1Port} (${matched.ref2Unit}/${matched.ref2Port})
-
-`;
+`Pre ${pre.baseband} RiPort=${pre.ref1Port} ---> Post ${matched.baseband} RiPort=${matched.ref1Port}\n`;
 
         }
 
@@ -643,7 +641,6 @@ function generateMapping(){
     document.getElementById("mappingOutput")
     .innerText = output;
 }
-
 /* =========================
 RADIO SWAP
 ========================= */
