@@ -429,8 +429,8 @@ cmedit set NetworkElement=${site},PmFunction=1 pmEnabled=true
 }
 
 /* =========================
-FINAL CORRECT RI MAPPING
-ERICSSON BB/XMU LOGIC
+FINAL DYNAMIC ERICSSON
+RI PORT MAPPING LOGIC
 ========================= */
 
 function generateMapping(){
@@ -461,29 +461,53 @@ function generateMapping(){
 
         let mappings = [];
 
-        let currentBaseband = "";
-
 
 
         /* =========================
-        DETECT BASEBAND DETAILS
+        DYNAMIC FRU MAP
+        FROM hget fi prod
         ========================= */
+
+        let fruMap = {};
+
+
 
         lines.forEach(line => {
 
-            if(line.includes("Baseband")){
+            if(
+                line.includes("FieldReplaceableUnit=")
+                &&
+                line.includes("Baseband")
+            ){
 
-                let bbMatch =
+                /*
+                Examples:
+
+                FieldReplaceableUnit=1 Baseband 6648
+                FieldReplaceableUnit=1 Baseband 5216
+                FieldReplaceableUnit=BB-01 Baseband 6630
+                FieldReplaceableUnit=XMU03-1-7 Baseband R503
+                */
+
+                let match =
                 line.match(
-/Baseband\s+[A-Z0-9\-\/ ]+\s+KDU[ A-Z0-9\/\-]+\s+R[0-9A-Z]+\s+[0-9]{8}\s+[A-Z0-9]+/i
+/FieldReplaceableUnit=([A-Z0-9\-]+)\s+Baseband\s+([A-Z0-9 ]+)/i
                 );
 
-                if(bbMatch){
 
-                    currentBaseband =
-                    bbMatch[0]
-                    .replace(/\s+/g,' ')
+
+                if(match){
+
+                    let fru =
+                    match[1]
                     .trim();
+
+                    let bb =
+                    `Baseband ${match[2]
+                    .trim()
+                    .replace(/\s+/g,' ')}`;
+
+                    fruMap[fru] = bb;
                 }
             }
 
@@ -491,8 +515,9 @@ function generateMapping(){
 
 
 
+
         /* =========================
-        DETECT RI LINKS
+        PARSE RI LINKS
         ========================= */
 
         lines.forEach(line => {
@@ -503,33 +528,53 @@ function generateMapping(){
                 line.includes("RiPort=")
             ){
 
-                let allRefs =
+                let refs =
                 [...line.matchAll(
 /FieldReplaceableUnit=([^,]+),RiPort=([A-Z0-9_]+)/g
                 )];
 
 
 
-                if(allRefs.length >= 2){
+                if(refs.length >= 2){
+
+                    /*
+                    riPortRef1
+                    */
 
                     let ref1Unit =
-                    allRefs[0][1];
+                    refs[0][1];
 
                     let ref1Port =
-                    allRefs[0][2];
+                    refs[0][2];
+
+
+
+                    /*
+                    riPortRef2
+                    */
 
                     let ref2Unit =
-                    allRefs[1][1];
+                    refs[1][1];
 
                     let ref2Port =
-                    allRefs[1][2];
+                    refs[1][2];
+
+
+
+                    /*
+                    Dynamic Display Name
+                    */
+
+                    let displayName =
+                    fruMap[ref1Unit]
+                    || ref1Unit;
 
 
 
                     mappings.push({
 
-                        baseband:
-                        currentBaseband,
+                        displayName:
+                        displayName,
 
                         ref1Unit:
                         ref1Unit,
@@ -549,6 +594,8 @@ function generateMapping(){
 
         });
 
+
+
         return mappings;
     }
 
@@ -565,6 +612,8 @@ function generateMapping(){
 
     preMappings =
     preMappings.concat(parseData(pre2));
+
+
 
     if(
         pre3.trim().toUpperCase() !== "NA"
@@ -605,55 +654,13 @@ function generateMapping(){
 
         if(matched){
 
-            /* =========================
-            PRE DISPLAY
-            ========================= */
+            let preDisplay =
+            `${pre.displayName} RiPort=${pre.ref1Port}`;
 
-            let preDisplay = "";
-
-            if(
-                pre.ref1Unit === "1"
-                ||
-                pre.ref1Unit.startsWith("BB")
-            ){
-
-                preDisplay =
-                `${pre.baseband} RiPort=${pre.ref1Port}`;
-
-            }else{
-
-                preDisplay =
-                `${pre.ref1Unit} RiPort=${pre.ref1Port}`;
-            }
+            let postDisplay =
+            `${matched.displayName} RiPort=${matched.ref1Port}`;
 
 
-
-            /* =========================
-            POST DISPLAY
-            ========================= */
-
-            let postDisplay = "";
-
-            if(
-                matched.ref1Unit === "1"
-                ||
-                matched.ref1Unit.startsWith("BB")
-            ){
-
-                postDisplay =
-                `${matched.baseband} RiPort=${matched.ref1Port}`;
-
-            }else{
-
-                postDisplay =
-                `${matched.ref1Unit} RiPort=${matched.ref1Port}`;
-            }
-
-
-
-            /* =========================
-            FINAL OUTPUT
-            ========================= */
 
             output +=
 `Pre ${preDisplay} ---> Post ${postDisplay}\n`;
@@ -665,12 +672,13 @@ function generateMapping(){
 
 
     /* =========================
-    FINAL RESULT
+    FINAL OUTPUT
     ========================= */
 
     document.getElementById("mappingOutput")
     .innerText = output;
 }
+
 /* =========================
 RADIO SWAP
 ========================= */
