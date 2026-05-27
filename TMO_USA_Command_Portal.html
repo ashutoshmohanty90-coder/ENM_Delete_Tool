@@ -428,10 +428,9 @@ cmedit set NetworkElement=${site},PmFunction=1 pmEnabled=true
     .innerText = commands;
 }
 
-
 /* =========================
-CORRECT RI MAPPING
-FINAL VERSION
+FINAL CORRECT RI MAPPING
+ERICSSON BB/XMU LOGIC
 ========================= */
 
 function generateMapping(){
@@ -467,10 +466,7 @@ function generateMapping(){
 
 
         /* =========================
-        DETECT BASEBAND
-        Supports:
-        FieldReplaceableUnit=1
-        FieldReplaceableUnit=BB-01
+        DETECT BASEBAND DETAILS
         ========================= */
 
         lines.forEach(line => {
@@ -479,21 +475,15 @@ function generateMapping(){
 
                 let bbMatch =
                 line.match(
-/FieldReplaceableUnit=[^ ]+\s+Baseband\s+[A-Z0-9\-\/ ]+/i
+/Baseband\s+[A-Z0-9\-\/ ]+\s+KDU[ A-Z0-9\/\-]+\s+R[0-9A-Z]+\s+[0-9]{8}\s+[A-Z0-9]+/i
                 );
 
                 if(bbMatch){
 
-                    let clean =
+                    currentBaseband =
                     bbMatch[0]
-                    .replace(
-/FieldReplaceableUnit=[^ ]+\s+/i,
-''
-                    )
                     .replace(/\s+/g,' ')
                     .trim();
-
-                    currentBaseband = clean;
                 }
             }
 
@@ -522,21 +512,11 @@ function generateMapping(){
 
                 if(allRefs.length >= 2){
 
-                    /* =========================
-                    riPortRef1
-                    ========================= */
-
                     let ref1Unit =
                     allRefs[0][1];
 
                     let ref1Port =
                     allRefs[0][2];
-
-
-
-                    /* =========================
-                    riPortRef2
-                    ========================= */
 
                     let ref2Unit =
                     allRefs[1][1];
@@ -625,8 +605,58 @@ function generateMapping(){
 
         if(matched){
 
+            /* =========================
+            PRE DISPLAY
+            ========================= */
+
+            let preDisplay = "";
+
+            if(
+                pre.ref1Unit === "1"
+                ||
+                pre.ref1Unit.startsWith("BB")
+            ){
+
+                preDisplay =
+                `${pre.baseband} RiPort=${pre.ref1Port}`;
+
+            }else{
+
+                preDisplay =
+                `${pre.ref1Unit} RiPort=${pre.ref1Port}`;
+            }
+
+
+
+            /* =========================
+            POST DISPLAY
+            ========================= */
+
+            let postDisplay = "";
+
+            if(
+                matched.ref1Unit === "1"
+                ||
+                matched.ref1Unit.startsWith("BB")
+            ){
+
+                postDisplay =
+                `${matched.baseband} RiPort=${matched.ref1Port}`;
+
+            }else{
+
+                postDisplay =
+                `${matched.ref1Unit} RiPort=${matched.ref1Port}`;
+            }
+
+
+
+            /* =========================
+            FINAL OUTPUT
+            ========================= */
+
             output +=
-`Pre ${pre.baseband} RiPort=${pre.ref1Port} ---> Post ${matched.baseband} RiPort=${matched.ref1Port}\n`;
+`Pre ${preDisplay} ---> Post ${postDisplay}\n`;
 
         }
 
@@ -635,7 +665,7 @@ function generateMapping(){
 
 
     /* =========================
-    FINAL OUTPUT
+    FINAL RESULT
     ========================= */
 
     document.getElementById("mappingOutput")
