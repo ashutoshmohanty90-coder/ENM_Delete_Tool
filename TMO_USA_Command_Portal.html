@@ -795,18 +795,25 @@ function extractRadioData(text){
         if(
             line.includes("FieldReplaceableUnit=")
             &&
-            line.includes("Radio")
+            (
+                line.includes("Radio")
+                ||
+                line.includes("RRUS")
+            )
         ){
 
             /*
-            Example:
+            Supports:
 
-FieldReplaceableUnit=RRU-114 Radio 4415 B2 B25 KRC 161 636/1 R5J 20201112 CF88363836
+            Radio 4415
+            Radio 4449
+            RRUS32AB66A
+            RRUS 32A B2
             */
 
             let match =
             line.match(
-/FieldReplaceableUnit=(\S+)\s+(.+?)\s+KRC\s+.+?\s+\d+\s+([A-Z0-9]+)/i
+/FieldReplaceableUnit=(\S+)\s+(.+?)\s+(KRC\s+.+?)\s+\d+\s+([A-Z0-9]+)/i
             );
 
 
@@ -817,12 +824,17 @@ FieldReplaceableUnit=RRU-114 Radio 4415 B2 B25 KRC 161 636/1 R5J 20201112 CF8836
                 match[1]
                 .trim();
 
+
+
                 let product =
                 match[2]
-                .trim();
+                .trim()
+                .replace(/\s+/g,' ');
+
+
 
                 let serial =
-                match[3]
+                match[4]
                 .trim();
 
 
@@ -838,6 +850,8 @@ FieldReplaceableUnit=RRU-114 Radio 4415 B2 B25 KRC 161 636/1 R5J 20201112 CF8836
         }
 
     });
+
+
 
     return radios;
 }
@@ -885,7 +899,7 @@ function checkRadioSwap(){
     output +=
     "RRU".padEnd(15) +
 
-    "ProductName".padEnd(30) +
+    "ProductName".padEnd(35) +
 
     "Pre Serial".padEnd(20) +
 
@@ -896,7 +910,7 @@ function checkRadioSwap(){
 
 
     output +=
-    "=".repeat(100) + "\n";
+    "=".repeat(110) + "\n";
 
 
 
@@ -918,7 +932,7 @@ function checkRadioSwap(){
             let remark =
             preRadio.serial === postRadio.serial
             ? "No Swap Observed"
-            : "NOK Swap Observed";
+            : "Swap Detected";
 
 
 
@@ -926,7 +940,7 @@ function checkRadioSwap(){
 
             preRadio.rru.padEnd(15) +
 
-            preRadio.product.padEnd(30) +
+            preRadio.product.padEnd(35) +
 
             preRadio.serial.padEnd(20) +
 
@@ -944,7 +958,6 @@ function checkRadioSwap(){
     document.getElementById("swapOutput")
     .innerText = output;
 }
-
 </script>
 
 </body>
