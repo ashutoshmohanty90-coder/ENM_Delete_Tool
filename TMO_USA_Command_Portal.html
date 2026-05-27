@@ -11,101 +11,115 @@
 
 body{
     margin:0;
-    font-family:Arial, sans-serif;
-    background:#050816;
+    padding:0;
+    background:#020617;
     color:white;
+    font-family:Arial;
 }
 
 .container{
-    max-width:1200px;
+    width:90%;
     margin:auto;
-    padding:30px;
+    padding:40px;
 }
 
 h1{
     text-align:center;
     color:#00d4ff;
-    margin-bottom:40px;
     font-size:50px;
+    margin-bottom:40px;
 }
 
 .tabs{
     display:flex;
-    gap:15px;
+    gap:20px;
     margin-bottom:30px;
 }
 
 .tab-btn{
-    padding:15px 30px;
-    border:none;
-    border-radius:12px;
     background:#111827;
     color:white;
-    font-weight:bold;
-    font-size:18px;
+    border:none;
+    padding:16px 28px;
+    border-radius:14px;
     cursor:pointer;
-    transition:0.3s;
+    font-size:18px;
+    font-weight:bold;
 }
 
 .tab-btn.active{
-    background:#00d4ff;
+    background:#06b6d4;
     color:black;
 }
 
 .tab-content{
-    background:#111827;
+    display:none;
+    background:#0f172a;
     padding:40px;
     border-radius:20px;
 }
 
+.tab-content.active{
+    display:block;
+}
+
 h2{
+    color:white;
     margin-bottom:30px;
-    font-size:32px;
+    font-size:40px;
 }
 
 input{
     width:100%;
     padding:18px;
     margin-bottom:20px;
-    background:#0f172a;
-    border:1px solid #334155;
     border-radius:12px;
+    border:1px solid #334155;
+    background:#0b132b;
     color:white;
     font-size:18px;
     box-sizing:border-box;
 }
 
+textarea{
+    width:100%;
+    min-height:220px;
+    padding:18px;
+    margin-bottom:25px;
+    border-radius:12px;
+    border:1px solid #334155;
+    background:#0b132b;
+    color:white;
+    font-size:15px;
+    box-sizing:border-box;
+    font-family:Consolas;
+}
+
 .btn-row{
-    margin-top:10px;
+    display:flex;
+    gap:20px;
+    margin-bottom:25px;
+    flex-wrap:wrap;
 }
 
 button{
-    padding:15px 25px;
+    background:#06b6d4;
     border:none;
+    padding:16px 26px;
     border-radius:12px;
-    background:#00d4ff;
-    color:black;
-    font-weight:bold;
-    font-size:18px;
     cursor:pointer;
-    margin-right:15px;
-    transition:0.3s;
-}
-
-button:hover{
-    opacity:0.9;
+    font-size:18px;
+    font-weight:bold;
 }
 
 pre{
-    margin-top:30px;
     background:black;
     padding:25px;
-    border-radius:15px;
-    color:#00ff88;
+    border-radius:12px;
+    overflow:auto;
     white-space:pre-wrap;
     font-size:15px;
-    line-height:1.7;
-    min-height:150px;
+    line-height:1.6;
 }
 
 </style>
@@ -116,213 +130,522 @@ pre{
 
 <div class="container">
 
-    <h1>TMO USA Command Portal</h1>
+<h1>TMO USA Command Portal</h1>
 
-    <!-- TABS -->
+<div class="tabs">
 
-    <div class="tabs">
+<button class="tab-btn active"
+onclick="showTab('deleteTab', this)">
+ENM Delete
+</button>
 
-        <button class="tab-btn active"
-        onclick="showTab('deleteTab', this)">
-            ENM Delete
-        </button>
+<button class="tab-btn"
+onclick="showTab('addTab', this)">
+ENM Add
+</button>
 
-        <button class="tab-btn"
-        onclick="showTab('addTab', this)">
-            ENM Add
-        </button>
-
-    </div>
-
-    <!-- ENM DELETE -->
-
-    <div id="deleteTab"
-    class="tab-content"
-    style="display:block;">
-
-        <h2>ENM Node Delete</h2>
-
-        <input type="text"
-        id="deleteSite"
-        placeholder="Enter Site ID">
-
-        <div class="btn-row">
-
-            <button onclick="generateDelete()">
-                Generate Commands
-            </button>
-
-            <button onclick="copyOutput('deleteOutput')">
-                Copy
-            </button>
-
-        </div>
-
-        <pre id="deleteOutput"></pre>
-
-    </div>
-
-    <!-- ENM ADD -->
-
-    <div id="addTab"
-    class="tab-content"
-    style="display:none;">
-
-        <h2>ENM Node Add</h2>
-
-        <input type="text"
-        id="addSite"
-        placeholder="Enter Site ID">
-
-        <input type="text"
-        id="ipAddress"
-        placeholder="Enter IP Address">
-
-        <input type="text"
-        id="timeZone"
-        placeholder="Enter Time Zone">
-
-        <div class="btn-row">
-
-            <button onclick="generateAdd()">
-                Generate Commands
-            </button>
-
-            <button onclick="copyOutput('addOutput')">
-                Copy
-            </button>
-
-        </div>
-
-        <pre id="addOutput"></pre>
-
-    </div>
+<button class="tab-btn"
+onclick="showTab('mappingTab', this)">
+RI Mapping / Radio Swap
+</button>
 
 </div>
 
+
+<!-- =========================
+ENM DELETE
+========================= -->
+
+<div id="deleteTab"
+class="tab-content active">
+
+<h2>ENM Node Delete</h2>
+
+<input type="text"
+id="deleteSite"
+placeholder="Enter Site ID">
+
+<div class="btn-row">
+
+<button onclick="generateDelete()">
+Generate Commands
+</button>
+
+<button onclick="copyDelete()">
+Copy
+</button>
+
+</div>
+
+<pre id="deleteOutput"></pre>
+
+</div>
+
+
+
+<!-- =========================
+ENM ADD
+========================= -->
+
+<div id="addTab"
+class="tab-content">
+
+<h2>ENM Node Add</h2>
+
+<input type="text"
+id="addSite"
+placeholder="Enter Site ID">
+
+<input type="text"
+id="ipAddress"
+placeholder="Enter IP Address">
+
+<input type="text"
+id="timeZone"
+placeholder="Enter Time Zone">
+
+<div class="btn-row">
+
+<button onclick="generateAdd()">
+Generate Commands
+</button>
+
+<button onclick="copyAdd()">
+Copy
+</button>
+
+</div>
+
+<pre id="addOutput"></pre>
+
+</div>
+
+
+
+
+<!-- =========================
+RI MAPPING TAB
+========================= -->
+
+<div id="mappingTab"
+class="tab-content">
+
+<h2>RI Port Mapping & Radio Swap Check</h2>
+
+<h3>Pre BB1 Data</h3>
+
+<textarea id="preBB1"
+placeholder="Paste PRE BB1 hget rilink riport + hget fi prod output"></textarea>
+
+<h3>Pre BB2 Data</h3>
+
+<textarea id="preBB2"
+placeholder="Paste PRE BB2 hget rilink riport + hget fi prod output"></textarea>
+
+<h3>Pre BB3 Data (Optional / NA)</h3>
+
+<textarea id="preBB3"
+placeholder="Paste PRE BB3 output OR type NA"></textarea>
+
+<h3>Post G3 BB Data</h3>
+
+<textarea id="postBB"
+placeholder="Paste POST G3 BB hget rilink riport + hget fi prod output"></textarea>
+
+<div class="btn-row">
+
+<button onclick="generateMapping()">
+Generate RI Mapping
+</button>
+
+<button onclick="checkRadioSwap()">
+Check Radio Swap
+</button>
+
+</div>
+
+<h3>RI Port Mapping</h3>
+
+<pre id="mappingOutput"></pre>
+
+<h3>Radio Swap Check</h3>
+
+<pre id="swapOutput"></pre>
+
+</div>
+
+</div>
+
+
+
+
 <script>
 
-/* TAB SWITCH */
+/* =========================
+TAB SWITCH
+========================= */
 
-function showTab(tabId, element){
+function showTab(tabId, btn){
 
-    let tabs = document.querySelectorAll(".tab-content");
+    let tabs =
+    document.querySelectorAll(".tab-content");
 
-    tabs.forEach(function(tab){
-        tab.style.display = "none";
+    tabs.forEach(tab => {
+        tab.classList.remove("active");
     });
 
-    document.getElementById(tabId).style.display = "block";
+    document
+    .getElementById(tabId)
+    .classList.add("active");
 
-    let buttons = document.querySelectorAll(".tab-btn");
+    let buttons =
+    document.querySelectorAll(".tab-btn");
 
-    buttons.forEach(function(btn){
-        btn.classList.remove("active");
+    buttons.forEach(button => {
+        button.classList.remove("active");
     });
 
-    element.classList.add("active");
+    btn.classList.add("active");
 }
 
-/* ENM DELETE */
+
+
+/* =========================
+DELETE COMMAND
+========================= */
 
 function generateDelete(){
 
-    let site = document.getElementById("deleteSite").value;
-
-    if(site.trim() === ""){
-        alert("Please enter Site ID");
-        return;
-    }
+    let site =
+    document.getElementById("deleteSite").value;
 
     let commands = `
-cmedit get *XXXX* FmAlarmsupervision.* ; Inventorysupervision.* ; pmFunction.*;cmNodeHeartbeatsupervision.*; cmFunction.* -t
 
-cmedit set NetworkElement=XXXX,CmNodeHeartbeatSupervision=1 active=false
+cmedit get *${site}* FmAlarmsupervision.* ; Inventorysupervision.* ; pmFunction.*;cmNodeHeartbeatsupervision.*; cmFunction.* -t
 
-cmedit set NetworkElement=XXXX,InventorySupervision=1 active=false
+cmedit set NetworkElement=${site},CmNodeHeartbeatSupervision=1 active=false
 
-fmedit set XXXX FmAlarmSupervision alarmSupervisionState=false
+cmedit set NetworkElement=${site},InventorySupervision=1 active=false
 
-cmedit set NetworkElement=XXXX,PmFunction=1 pmEnabled=false
+fmedit set ${site} FmAlarmSupervision alarmSupervisionState=false
 
-cmedit action NetworkElement=XXXX,CmFunction=1 deleteNrmDataFromEnm
+cmedit set NetworkElement=${site},PmFunction=1 pmEnabled=false
 
-cmedit delete NetworkElement=XXXX --ALL --force
+cmedit action NetworkElement=${site},CmFunction=1 deleteNrmDataFromEnm
 
-cmedit get NetworkElement=XXXX
+cmedit delete NetworkElement=${site} –ALL --force
 
-ap order -nv file:XXXX.zip
+cmedit get NetworkElement=${site}
 
-ap status -n XXXX
+ap order -nv file:${site}.zip
+
+ap status -n ${site}
+
 `;
 
-    commands = commands.replaceAll("XXXX", site);
-
-    document.getElementById("deleteOutput").innerText = commands;
+    document.getElementById("deleteOutput")
+    .innerText = commands;
 }
 
-/* ENM ADD */
 
-function generateAdd(){
+function copyDelete(){
 
-    let site = document.getElementById("addSite").value;
-
-    let ip = document.getElementById("ipAddress").value;
-
-    let timezone = document.getElementById("timeZone").value;
-
-    if(site.trim() === "" || ip.trim() === "" || timezone.trim() === ""){
-        alert("Please fill all fields");
-        return;
-    }
-
-    let commands = `
-cmedit create NetworkElement=YYYY networkElementId=YYYY, neType=RadioNode, ossPrefix="SubNetwork=ONRM_ROOT_MO,SubNetwork=Bloomfield,MeContext=YYYY" -ns=OSS_NE_DEF -v=2.0.0
-
-cmedit create NetworkElement=YYYY,ComConnectivityInformation=1 ComConnectivityInformationId=1, transportProtocol=TLS, ipAddress="IPADDRESS", port=6513, snmpSecurityName=defaultsnmpuser, snmpVersion=SNMP_V3, snmpSecurityLevel=NO_AUTH_NO_PRIV -ns=COM_MED -v=1.1.0
-
-secadm credentials create -sn prbs -sp "@WtIwQ-Bo2m0" -n YYYY
-
-cmedit set NetworkElement=YYYY timeZone=TIMEZONE
-
-cmedit set NetworkElement=YYYY managementState=NORMAL
-
-alarm enable YYYY
-
-cmedit set NetworkElement=YYYY,SecurityFunction=1,NetworkElementSecurity=1 algorithmAndKeySize=RSA_2048, enrollmentMode=CMPv2_VC
-
-cmedit set NetworkElement=YYYY,CmNodeHeartbeatSupervision=1 active=true
-
-cmedit set NetworkElement=YYYY,InventorySupervision=1 active=true
-
-fmedit set YYYY FmAlarmSupervision alarmSupervisionState=true
-
-cmedit set NetworkElement=YYYY,PmFunction=1 pmEnabled=true
-`;
-
-    commands = commands.replaceAll("YYYY", site);
-
-    commands = commands.replaceAll("IPADDRESS", ip);
-
-    commands = commands.replaceAll("TIMEZONE", timezone);
-
-    document.getElementById("addOutput").innerText = commands;
-}
-
-/* COPY FUNCTION */
-
-function copyOutput(id){
-
-    let text = document.getElementById(id).innerText;
-
-    if(text.trim() === ""){
-        alert("No commands generated");
-        return;
-    }
+    let text =
+    document.getElementById("deleteOutput")
+    .innerText;
 
     navigator.clipboard.writeText(text);
 
-    alert("Commands Copied Successfully!");
+    alert("Copied Successfully");
+}
+
+
+
+/* =========================
+ADD COMMAND
+========================= */
+
+function generateAdd(){
+
+    let site =
+    document.getElementById("addSite").value;
+
+    let ip =
+    document.getElementById("ipAddress").value;
+
+    let zone =
+    document.getElementById("timeZone").value;
+
+    let commands = `
+
+cmedit create NetworkElement=${site} networkElementId=${site}, neType=RadioNode, ossPrefix="SubNetwork=ONRM_ROOT_MO,SubNetwork=Bloomfield,MeContext=${site}" -ns=OSS_NE_DEF -v=2.0.0
+
+cmedit create NetworkElement=${site},ComConnectivityInformation=1 ComConnectivityInformationId=1, transportProtocol=TLS, ipAddress="${ip}", port=6513, snmpSecurityName=defaultsnmpuser, snmpVersion=SNMP_V3, snmpSecurityLevel=NO_AUTH_NO_PRIV -ns=COM_MED -v=1.1.0
+
+secadm credentials create -sn prbs -sp "@WtIwQ-Bo2m0" -n ${site}
+
+cmedit set NetworkElement=${site} timeZone=${zone}
+
+cmedit set NetworkElement=${site} managementState=NORMAL
+
+alarm enable ${site}
+
+cmedit set NetworkElement=${site},SecurityFunction=1,NetworkElementSecurity=1 algorithmAndKeySize=RSA_2048, enrollmentMode=CMPv2_VC
+
+cmedit set NetworkElement=${site},CmNodeHeartbeatSupervision=1 active=true
+
+cmedit set NetworkElement=${site},InventorySupervision=1 active=true
+
+fmedit set ${site} FmAlarmSupervision alarmSupervisionState=true
+
+cmedit set NetworkElement=${site},PmFunction=1 pmEnabled=true
+
+`;
+
+    document.getElementById("addOutput")
+    .innerText = commands;
+}
+
+
+
+function copyAdd(){
+
+    let text =
+    document.getElementById("addOutput")
+    .innerText;
+
+    navigator.clipboard.writeText(text);
+
+    alert("Copied Successfully");
+}
+
+
+
+/* =========================
+RI LINK PARSER
+========================= */
+
+function extractRiLinks(text){
+
+    let lines = text.split('\n');
+
+    let result = [];
+
+    lines.forEach(line => {
+
+        if(line.includes("RiLink=")
+        && line.includes("FieldReplaceableUnit")){
+
+            let matches =
+            line.match(/FieldReplaceableUnit=([^,]+),RiPort=([A-Z0-9_]+)/g);
+
+            if(matches && matches.length >= 2){
+
+                let first =
+                matches[0];
+
+                let second =
+                matches[1];
+
+                let prePort =
+                first.match(/RiPort=([A-Z0-9_]+)/)[1];
+
+                let postUnit =
+                second.match(/FieldReplaceableUnit=([^,]+)/)[1];
+
+                let postPort =
+                second.match(/RiPort=([A-Z0-9_]+)/)[1];
+
+                result.push({
+                    prePort,
+                    postUnit,
+                    postPort
+                });
+            }
+        }
+
+    });
+
+    return result;
+}
+
+
+
+/* =========================
+BASEBAND NAME
+========================= */
+
+function extractBaseband(text){
+
+    let match =
+    text.match(/Baseband\s[0-9R ]+/);
+
+    if(match){
+        return match[0];
+    }
+
+    return "Baseband";
+}
+
+
+
+/* =========================
+RI MAPPING
+========================= */
+
+function generateMapping(){
+
+    let pre1 =
+    document.getElementById("preBB1").value;
+
+    let pre2 =
+    document.getElementById("preBB2").value;
+
+    let pre3 =
+    document.getElementById("preBB3").value;
+
+    let post =
+    document.getElementById("postBB").value;
+
+    let postLinks =
+    extractRiLinks(post);
+
+    let output = "";
+
+
+
+    function processPre(preText){
+
+        if(preText.trim() === ""
+        || preText.trim().toUpperCase() === "NA"){
+            return;
+        }
+
+        let bbName =
+        extractBaseband(preText);
+
+        let preLinks =
+        extractRiLinks(preText);
+
+        preLinks.forEach(preLink => {
+
+            let matched =
+            postLinks.find(postLink =>
+                postLink.postUnit === preLink.postUnit
+            );
+
+            if(matched){
+
+                output +=
+`Pre ${bbName} RiPort=${preLink.prePort}
+ ---> Post ${matched.postUnit}, RiPort=${matched.postPort}
+
+`;
+            }
+
+        });
+
+    }
+
+    processPre(pre1);
+    processPre(pre2);
+    processPre(pre3);
+
+    document.getElementById("mappingOutput")
+    .innerText = output;
+
+}
+
+
+
+/* =========================
+RADIO SWAP CHECK
+========================= */
+
+function extractRadioData(text){
+
+    let radios = [];
+
+    let regex =
+/(FieldReplaceableUnit=[A-Z0-9\\-]+)\\s+(.+?)\\s+[A-Z0-9\\/]+\\s+R[0-9A-Z]+\\s+[0-9]+\\s+([A-Z0-9]+)/g;
+
+    let match;
+
+    while((match = regex.exec(text)) !== null){
+
+        radios.push({
+            rru: match[1],
+            product: match[2].trim(),
+            serial: match[3]
+        });
+    }
+
+    return radios;
+}
+
+
+
+function checkRadioSwap(){
+
+    let pre1 =
+    document.getElementById("preBB1").value;
+
+    let pre2 =
+    document.getElementById("preBB2").value;
+
+    let pre3 =
+    document.getElementById("preBB3").value;
+
+    let post =
+    document.getElementById("postBB").value;
+
+    let preCombined =
+    pre1 + "\n" + pre2 + "\n" + pre3;
+
+    let preRadios =
+    extractRadioData(preCombined);
+
+    let postRadios =
+    extractRadioData(post);
+
+    let output = "";
+
+    output +=
+"RRU | Product | Pre Serial | Post Serial | Remark\n";
+
+    output +=
+"====================================================================\n";
+
+
+    preRadios.forEach(preRadio => {
+
+        let postRadio =
+        postRadios.find(p =>
+            p.rru === preRadio.rru
+        );
+
+        if(postRadio){
+
+            let remark =
+            preRadio.serial === postRadio.serial
+            ? "No Swap Observed"
+            : "NOK Swap Observed";
+
+            output +=
+`${preRadio.rru}
+| ${preRadio.product}
+| ${preRadio.serial}
+| ${postRadio.serial}
+| ${remark}
+
+`;
+        }
+
+    });
+
+    document.getElementById("swapOutput")
+    .innerText = output;
+
 }
 
 </script>
