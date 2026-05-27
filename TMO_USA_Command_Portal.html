@@ -434,13 +434,6 @@ cmedit set NetworkElement=${site},PmFunction=1 pmEnabled=true
 /* =========================
 CORRECT RI MAPPING
 ========================= */
-
-<!-- =========================
-REPLACE ONLY THIS FUNCTION
-========================= -->
-
-<script>
-
 function generateMapping(){
 
     let pre1 =
@@ -460,28 +453,32 @@ function generateMapping(){
 
 
     /* =========================
-    PARSE RI DATA
+    PARSE DATA
     ========================= */
 
-    function parseRiData(text){
+    function parseData(text){
 
         let lines = text.split('\n');
 
-        let currentBaseband = "";
-
         let mappings = [];
 
+        let currentBaseband = "";
 
+
+
+        /* =========================
+        GET BASEBAND NAME
+        Example:
+        FieldReplaceableUnit=1 Baseband 6630
+        ========================= */
 
         lines.forEach(line => {
 
-            /* =========================
-            DETECT BASEBAND
-            Example:
-            FieldReplaceableUnit=1 Baseband 6648
-            ========================= */
-
-            if(line.includes("Baseband")){
+            if(
+                line.includes("FieldReplaceableUnit=1")
+                &&
+                line.includes("Baseband")
+            ){
 
                 let bbMatch =
                 line.match(/Baseband\s+[A-Z0-9\- ]+/i);
@@ -495,43 +492,49 @@ function generateMapping(){
                 }
             }
 
+        });
 
 
-            /* =========================
-            DETECT RI LINKS
-            ========================= */
+
+        /* =========================
+        GET RI LINKS
+        ========================= */
+
+        lines.forEach(line => {
 
             if(
                 line.includes("RiLink=")
                 &&
-                line.includes("riPortRef1")
-                &&
-                line.includes("riPortRef2")
+                line.includes("FieldReplaceableUnit=")
             ){
 
-                /* =========================
-                REF1
-                ========================= */
-
-                let ref1Match =
+                let ref1 =
                 line.match(
-/riPortRef1=.*?FieldReplaceableUnit=([^,]+),RiPort=([A-Z0-9]+)/i
+/FieldReplaceableUnit=([^,]+),RiPort=([A-Z0-9]+)/i
                 );
 
-
-
-                /* =========================
-                REF2
-                ========================= */
-
-                let ref2Match =
-                line.match(
-/riPortRef2=.*?FieldReplaceableUnit=([^,]+),RiPort=([A-Z0-9_]+)/i
-                );
+                let allRefs =
+                [...line.matchAll(
+/FieldReplaceableUnit=([^,]+),RiPort=([A-Z0-9_]+)/g
+                )];
 
 
 
-                if(ref1Match && ref2Match){
+                if(allRefs.length >= 2){
+
+                    let ref1Unit =
+                    allRefs[0][1];
+
+                    let ref1Port =
+                    allRefs[0][2];
+
+                    let ref2Unit =
+                    allRefs[1][1];
+
+                    let ref2Port =
+                    allRefs[1][2];
+
+
 
                     mappings.push({
 
@@ -539,17 +542,16 @@ function generateMapping(){
                         currentBaseband,
 
                         ref1Unit:
-                        ref1Match[1],
+                        ref1Unit,
 
                         ref1Port:
-                        ref1Match[2],
+                        ref1Port,
 
                         ref2Unit:
-                        ref2Match[1],
+                        ref2Unit,
 
                         ref2Port:
-                        ref2Match[2]
-
+                        ref2Port
                     });
                 }
             }
@@ -562,33 +564,33 @@ function generateMapping(){
 
 
     /* =========================
-    PRE MAPPINGS
+    PRE DATA
     ========================= */
 
     let preMappings = [];
 
     preMappings =
-    preMappings.concat(parseRiData(pre1));
+    preMappings.concat(parseData(pre1));
 
     preMappings =
-    preMappings.concat(parseRiData(pre2));
+    preMappings.concat(parseData(pre2));
 
     if(
         pre3.trim().toUpperCase() !== "NA"
     ){
 
         preMappings =
-        preMappings.concat(parseRiData(pre3));
+        preMappings.concat(parseData(pre3));
     }
 
 
 
     /* =========================
-    POST MAPPINGS
+    POST DATA
     ========================= */
 
     let postMappings =
-    parseRiData(post);
+    parseData(post);
 
 
 
@@ -613,7 +615,8 @@ function generateMapping(){
         if(matched){
 
             output +=
-`Pre ${pre.baseband} RiPort=${pre.ref1Port} ---> Post ${matched.baseband} RiPort=${matched.ref1Port}
+`Pre ${pre.baseband} RiPort=${pre.ref1Port} (${pre.ref2Unit}/${pre.ref2Port})
+ ---> Post ${matched.baseband} RiPort=${matched.ref1Port} (${matched.ref2Unit}/${matched.ref2Port})
 
 `;
         }
@@ -629,8 +632,6 @@ function generateMapping(){
     document.getElementById("mappingOutput")
     .innerText = output;
 }
-
-</script>
 
 
 /* =========================
