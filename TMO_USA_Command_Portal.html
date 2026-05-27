@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>TMO USA Command Portal</title>
+
+<style>
+
+body{
+    margin:0;
+    font-family:Arial, sans-serif;
+    background:#050816;
+    color:white;
+}
+
+.container{
+    max-width:1200px;
+    margin:auto;
+    padding:30px;
+}
+
+h1{
+    text-align:center;
+    color:#00d4ff;
+    margin-bottom:40px;
+    font-size:50px;
+}
+
+.tabs{
+    display:flex;
+    gap:15px;
+    margin-bottom:30px;
+}
+
+.tab-btn{
+    padding:15px 30px;
+    border:none;
+    border-radius:12px;
+    background:#111827;
+    color:white;
+    font-weight:bold;
+    font-size:18px;
+    cursor:pointer;
+    transition:0.3s;
+}
+
+.tab-btn.active{
+    background:#00d4ff;
+    color:black;
+}
+
+.tab-content{
+    background:#111827;
+    padding:40px;
+    border-radius:20px;
+}
+
+h2{
+    margin-bottom:30px;
+    font-size:32px;
+}
+
+input{
+    width:100%;
+    padding:18px;
+    margin-bottom:20px;
+    background:#0f172a;
+    border:1px solid #334155;
+    border-radius:12px;
+    color:white;
+    font-size:18px;
+    box-sizing:border-box;
+}
+
+.btn-row{
+    margin-top:10px;
+}
+
+button{
+    padding:15px 25px;
+    border:none;
+    border-radius:12px;
+    background:#00d4ff;
+    color:black;
+    font-weight:bold;
+    font-size:18px;
+    cursor:pointer;
+    margin-right:15px;
+    transition:0.3s;
+}
+
+button:hover{
+    opacity:0.9;
+}
+
+pre{
+    margin-top:30px;
+    background:black;
+    padding:25px;
+    border-radius:15px;
+    color:#00ff88;
+    white-space:pre-wrap;
+    font-size:15px;
+    line-height:1.7;
+    min-height:150px;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1>TMO USA Command Portal</h1>
+
+    <!-- TABS -->
+
+    <div class="tabs">
+
+        <button class="tab-btn active"
+        onclick="showTab('deleteTab', this)">
+            ENM Delete
+        </button>
+
+        <button class="tab-btn"
+        onclick="showTab('addTab', this)">
+            ENM Add
+        </button>
+
+    </div>
+
+    <!-- ENM DELETE -->
+
+    <div id="deleteTab"
+    class="tab-content"
+    style="display:block;">
+
+        <h2>ENM Node Delete</h2>
+
+        <input type="text"
+        id="deleteSite"
+        placeholder="Enter Site ID">
+
+        <div class="btn-row">
+
+            <button onclick="generateDelete()">
+                Generate Commands
+            </button>
+
+            <button onclick="copyOutput('deleteOutput')">
+                Copy
+            </button>
+
+        </div>
+
+        <pre id="deleteOutput"></pre>
+
+    </div>
+
+    <!-- ENM ADD -->
+
+    <div id="addTab"
+    class="tab-content"
+    style="display:none;">
+
+        <h2>ENM Node Add</h2>
+
+        <input type="text"
+        id="addSite"
+        placeholder="Enter Site ID">
+
+        <input type="text"
+        id="ipAddress"
+        placeholder="Enter IP Address">
+
+        <input type="text"
+        id="timeZone"
+        placeholder="Enter Time Zone">
+
+        <div class="btn-row">
+
+            <button onclick="generateAdd()">
+                Generate Commands
+            </button>
+
+            <button onclick="copyOutput('addOutput')">
+                Copy
+            </button>
+
+        </div>
+
+        <pre id="addOutput"></pre>
+
+    </div>
+
+</div>
+
+<script>
+
+/* TAB SWITCH */
+
+function showTab(tabId, element){
+
+    let tabs = document.querySelectorAll(".tab-content");
+
+    tabs.forEach(function(tab){
+        tab.style.display = "none";
+    });
+
+    document.getElementById(tabId).style.display = "block";
+
+    let buttons = document.querySelectorAll(".tab-btn");
+
+    buttons.forEach(function(btn){
+        btn.classList.remove("active");
+    });
+
+    element.classList.add("active");
+}
+
+/* ENM DELETE */
+
+function generateDelete(){
+
+    let site = document.getElementById("deleteSite").value;
+
+    if(site.trim() === ""){
+        alert("Please enter Site ID");
+        return;
+    }
+
+    let commands = `
+cmedit get *XXXX* FmAlarmsupervision.* ; Inventorysupervision.* ; pmFunction.*;cmNodeHeartbeatsupervision.*; cmFunction.* -t
+
+cmedit set NetworkElement=XXXX,CmNodeHeartbeatSupervision=1 active=false
+
+cmedit set NetworkElement=XXXX,InventorySupervision=1 active=false
+
+fmedit set XXXX FmAlarmSupervision alarmSupervisionState=false
+
+cmedit set NetworkElement=XXXX,PmFunction=1 pmEnabled=false
+
+cmedit action NetworkElement=XXXX,CmFunction=1 deleteNrmDataFromEnm
+
+cmedit delete NetworkElement=XXXX --ALL --force
+
+cmedit get NetworkElement=XXXX
+
+ap order -nv file:XXXX.zip
+
+ap status -n XXXX
+`;
+
+    commands = commands.replaceAll("XXXX", site);
+
+    document.getElementById("deleteOutput").innerText = commands;
+}
+
+/* ENM ADD */
+
+function generateAdd(){
+
+    let site = document.getElementById("addSite").value;
+
+    let ip = document.getElementById("ipAddress").value;
+
+    let timezone = document.getElementById("timeZone").value;
+
+    if(site.trim() === "" || ip.trim() === "" || timezone.trim() === ""){
+        alert("Please fill all fields");
+        return;
+    }
+
+    let commands = `
+cmedit create NetworkElement=YYYY networkElementId=YYYY, neType=RadioNode, ossPrefix="SubNetwork=ONRM_ROOT_MO,SubNetwork=Bloomfield,MeContext=YYYY" -ns=OSS_NE_DEF -v=2.0.0
+
+cmedit create NetworkElement=YYYY,ComConnectivityInformation=1 ComConnectivityInformationId=1, transportProtocol=TLS, ipAddress="IPADDRESS", port=6513, snmpSecurityName=defaultsnmpuser, snmpVersion=SNMP_V3, snmpSecurityLevel=NO_AUTH_NO_PRIV -ns=COM_MED -v=1.1.0
+
+secadm credentials create -sn prbs -sp "@WtIwQ-Bo2m0" -n YYYY
+
+cmedit set NetworkElement=YYYY timeZone=TIMEZONE
+
+cmedit set NetworkElement=YYYY managementState=NORMAL
+
+alarm enable YYYY
+
+cmedit set NetworkElement=YYYY,SecurityFunction=1,NetworkElementSecurity=1 algorithmAndKeySize=RSA_2048, enrollmentMode=CMPv2_VC
+
+cmedit set NetworkElement=YYYY,CmNodeHeartbeatSupervision=1 active=true
+
+cmedit set NetworkElement=YYYY,InventorySupervision=1 active=true
+
+fmedit set YYYY FmAlarmSupervision alarmSupervisionState=true
+
+cmedit set NetworkElement=YYYY,PmFunction=1 pmEnabled=true
+`;
+
+    commands = commands.replaceAll("YYYY", site);
+
+    commands = commands.replaceAll("IPADDRESS", ip);
+
+    commands = commands.replaceAll("TIMEZONE", timezone);
+
+    document.getElementById("addOutput").innerText = commands;
+}
+
+/* COPY FUNCTION */
+
+function copyOutput(id){
+
+    let text = document.getElementById(id).innerText;
+
+    if(text.trim() === ""){
+        alert("No commands generated");
+        return;
+    }
+
+    navigator.clipboard.writeText(text);
+
+    alert("Commands Copied Successfully!");
+}
+
+</script>
+
+</body>
+</html>
