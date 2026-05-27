@@ -755,7 +755,6 @@ FieldReplaceableUnit=XMU03-1-7 Baseband R503 KDU 137 949/1 R2A 20170328 CD3Q7355
     document.getElementById("mappingOutput")
     .innerText = output;
 }
-
 /* =========================
 RADIO SWAP
 ========================= */
@@ -767,34 +766,60 @@ function extractRadioData(text){
     let lines =
     text.split('\n');
 
+
+
     lines.forEach(line => {
 
-        if(line.includes("FieldReplaceableUnit=")
-        && line.includes("Radio")){
+        if(
+            line.includes("FieldReplaceableUnit=")
+            &&
+            line.includes("Radio")
+        ){
 
-            let cols =
-            line.trim().split(/\s+/);
+            /*
+            Example:
 
-            let rru =
-            cols[0];
+FieldReplaceableUnit=RRU-114 Radio 4415 B2 B25 KRC 161 636/1 R5J 20201112 CF88363836
+            */
 
-            let serial =
-            cols[cols.length - 1];
+            let match =
+            line.match(
+/FieldReplaceableUnit=(\S+)\s+(.+?)\s+KRC\s+.+?\s+\d+\s+([A-Z0-9]+)/i
+            );
 
-            let product =
-            cols.slice(1, cols.length - 4).join(" ");
 
-            radios.push({
-                rru,
-                product,
-                serial
-            });
+
+            if(match){
+
+                let rru =
+                match[1]
+                .trim();
+
+                let product =
+                match[2]
+                .trim();
+
+                let serial =
+                match[3]
+                .trim();
+
+
+
+                radios.push({
+
+                    rru,
+                    product,
+                    serial
+
+                });
+            }
         }
 
     });
 
     return radios;
 }
+
 
 
 
@@ -812,8 +837,12 @@ function checkRadioSwap(){
     let post =
     document.getElementById("postBB").value;
 
+
+
     let preCombined =
     pre1 + "\n" + pre2 + "\n" + pre3;
+
+
 
     let preRadios =
     extractRadioData(preCombined);
@@ -821,14 +850,37 @@ function checkRadioSwap(){
     let postRadios =
     extractRadioData(post);
 
+
+
     let output = "";
 
-    output +=
-"RRU | Product | Pre Serial | Post Serial | Remark\n";
+
+
+    /* =========================
+    HEADER
+    ========================= */
 
     output +=
-"====================================================================================\n";
+    "RRU".padEnd(15) +
 
+    "ProductName".padEnd(30) +
+
+    "Pre Serial".padEnd(20) +
+
+    "Post Serial".padEnd(20) +
+
+    "Remark\n";
+
+
+
+    output +=
+    "=".repeat(100) + "\n";
+
+
+
+    /* =========================
+    COMPARE
+    ========================= */
 
     preRadios.forEach(preRadio => {
 
@@ -837,6 +889,8 @@ function checkRadioSwap(){
             p.rru === preRadio.rru
         );
 
+
+
         if(postRadio){
 
             let remark =
@@ -844,21 +898,29 @@ function checkRadioSwap(){
             ? "No Swap Observed"
             : "NOK Swap Observed";
 
-            output +=
-`${preRadio.rru}
-| ${preRadio.product}
-| ${preRadio.serial}
-| ${postRadio.serial}
-| ${remark}
 
-`;
+
+            output +=
+
+            preRadio.rru.padEnd(15) +
+
+            preRadio.product.padEnd(30) +
+
+            preRadio.serial.padEnd(20) +
+
+            postRadio.serial.padEnd(20) +
+
+            remark +
+
+            "\n";
         }
 
     });
 
+
+
     document.getElementById("swapOutput")
     .innerText = output;
-
 }
 
 </script>
