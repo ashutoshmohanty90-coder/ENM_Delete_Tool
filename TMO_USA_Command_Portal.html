@@ -461,6 +461,9 @@ function generateMapping(){
 
         /* =========================
         DYNAMIC FRU MAP
+        Supports:
+        - Baseband
+        - RAN Processor
         ========================= */
 
         let fruMap = {};
@@ -472,22 +475,28 @@ function generateMapping(){
             if(
                 line.includes("FieldReplaceableUnit=")
                 &&
-                line.includes("Baseband")
+                (
+                    line.includes("Baseband")
+                    ||
+                    line.includes("RAN Processor")
+                )
             ){
 
                 /*
-                Example:
+                Examples:
 
 FieldReplaceableUnit=1 Baseband 6648 KDU1370015/11 R3A/B 20201128 E23C159282
 
 FieldReplaceableUnit=BB-01 Baseband 6630 KDU137848/11 R3B 20200709 B070314453
 
 FieldReplaceableUnit=XMU03-1-7 Baseband R503 KDU 137 949/1 R2A 20170328 CD3Q735570
+
+FieldReplaceableUnit=1 RAN Processor 6651 KDU1370093/11 R2B 20230422 EA2A675780
                 */
 
                 let match =
                 line.match(
-/FieldReplaceableUnit=([A-Z0-9\-]+)\s+Baseband\s+([A-Z0-9 ]+)\s+(KDU[0-9 \/A-Z]+)\s+[A-Z0-9\/]+\s+[0-9]+\s+([A-Z0-9]+)/i
+/FieldReplaceableUnit=([A-Z0-9\-]+)\s+(Baseband|RAN Processor)\s+([A-Z0-9 ]+)\s+(KDU[0-9 \/A-Z]+)\s+[A-Z0-9\/]+\s+[0-9]+\s+([A-Z0-9]+)/i
                 );
 
 
@@ -498,19 +507,32 @@ FieldReplaceableUnit=XMU03-1-7 Baseband R503 KDU 137 949/1 R2A 20170328 CD3Q7355
                     match[1]
                     .trim();
 
-                    let productName =
+
+
+                    let category =
                     match[2]
+                    .trim();
+
+
+
+                    let model =
+                    match[3]
                     .trim()
                     .replace(/\s+/g,' ');
 
+
+
+                    let productName =
+                    `${category} ${model}`;
+
+
+
                     let productNumber =
-                    match[3]
+                    match[4]
                     .trim()
                     .replace(/\s+/g,'');
 
-                    /*
-                    remove /11
-                    */
+
 
                     productNumber =
                     productNumber.split('/')[0];
@@ -518,13 +540,13 @@ FieldReplaceableUnit=XMU03-1-7 Baseband R503 KDU 137 949/1 R2A 20170328 CD3Q7355
 
 
                     let serialNumber =
-                    match[4]
+                    match[5]
                     .trim();
 
 
 
                     let bb =
-                    `Baseband ${productName} ${serialNumber}`;
+                    `${productName} ${serialNumber}`;
 
 
 
