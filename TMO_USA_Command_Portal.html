@@ -1007,7 +1007,7 @@ function checkRadioSwap(){
 
 
 
-        output +=
+        let row =
 
         preRadio.rru.padEnd(15) +
 
@@ -1017,16 +1017,75 @@ function checkRadioSwap(){
 
         postSerial.padEnd(25) +
 
-        remark +
+        remark;
 
-        "\n";
+
+
+        /* =========================
+        ISSUE HIGHLIGHT
+        ========================= */
+
+        if(
+            remark !== "No Swap Observed"
+        ){
+
+            output +=
+            "⚠ " + row + "\n";
+        }
+
+        else{
+
+            output +=
+            row + "\n";
+        }
 
     });
 
 
 
+    /* =========================
+    RED COLOR + BOLD
+    ========================= */
+
+    let htmlOutput = "";
+
+    let lines = output.split("\n");
+
+
+
+    lines.forEach(line => {
+
+        if(
+            line.includes("⚠")
+        ){
+
+            htmlOutput +=
+`<div style="
+color:red;
+font-weight:bold;
+font-family:monospace;
+white-space:pre;
+">
+${line}
+</div>`;
+        }
+
+        else{
+
+            htmlOutput +=
+`<div style="
+font-family:monospace;
+white-space:pre;
+">
+${line}
+</div>`;
+        }
+    });
+
+
+
     document.getElementById("swapOutput")
-    .innerText = output;
+    .innerHTML = htmlOutput;
 }
 </script>
 
