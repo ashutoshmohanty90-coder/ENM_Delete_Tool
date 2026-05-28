@@ -809,43 +809,80 @@ function extractRadioData(text){
             Radio 4449
             RRUS32AB66A
             RRUS 32A B2
+
+            Also supports empty/down RRU rows:
+            FieldReplaceableUnit=RRU-11
             */
 
-            let match =
+            let fullMatch =
             line.match(
-/FieldReplaceableUnit=(\S+)\s+(.+?)\s+(KRC\s+.+?)\s+\d+\s+([A-Z0-9]+)/i
+/FieldReplaceableUnit=(\S+)\s+(.+)/
             );
 
 
 
-            if(match){
+            if(fullMatch){
 
                 let rru =
-                match[1]
+                fullMatch[1]
                 .trim();
 
 
 
-                let product =
-                match[2]
-                .trim()
-                .replace(/\s+/g,' ');
+                /* =========================
+                NORMAL RRU
+                ========================= */
+
+                let normalMatch =
+                line.match(
+/FieldReplaceableUnit=(\S+)\s+(.+?)\s+(KRC\s+.+?)\s+\d+\s+([A-Z0-9]+)/i
+                );
 
 
 
-                let serial =
-                match[4]
-                .trim();
+                if(normalMatch){
+
+                    let product =
+                    normalMatch[2]
+                    .trim()
+                    .replace(/\s+/g,' ');
 
 
 
-                radios.push({
+                    let serial =
+                    normalMatch[4]
+                    .trim();
 
-                    rru,
-                    product,
-                    serial
 
-                });
+
+                    radios.push({
+
+                        rru,
+                        product,
+                        serial
+
+                    });
+                }
+
+
+
+                /* =========================
+                DOWN / EMPTY RRU
+                ========================= */
+
+                else{
+
+                    radios.push({
+
+                        rru,
+                        product:
+                        "No Product Detected",
+
+                        serial:
+                        "No SL No Detected"
+
+                    });
+                }
             }
         }
 
@@ -901,16 +938,16 @@ function checkRadioSwap(){
 
     "ProductName".padEnd(35) +
 
-    "Pre Serial".padEnd(20) +
+    "Pre Serial".padEnd(25) +
 
-    "Post Serial".padEnd(20) +
+    "Post Serial".padEnd(25) +
 
     "Remark\n";
 
 
 
     output +=
-    "=".repeat(110) + "\n";
+    "=".repeat(120) + "\n";
 
 
 
@@ -927,29 +964,62 @@ function checkRadioSwap(){
 
 
 
+        let postSerial =
+        "No SL No Detected";
+
+
+
+        let remark =
+        "No SL No in Post";
+
+
+
         if(postRadio){
 
-            let remark =
-            preRadio.serial === postRadio.serial
-            ? "No Swap Observed"
-            : "Swap Detected";
+            postSerial =
+            postRadio.serial;
 
 
 
-            output +=
+            if(
+                preRadio.serial === postRadio.serial
+            ){
 
-            preRadio.rru.padEnd(15) +
+                remark =
+                "No Swap Observed";
+            }
 
-            preRadio.product.padEnd(35) +
+            else if(
+                postRadio.serial ===
+                "No SL No Detected"
+            ){
 
-            preRadio.serial.padEnd(20) +
+                remark =
+                "No SL No in Post";
+            }
 
-            postRadio.serial.padEnd(20) +
+            else{
 
-            remark +
-
-            "\n";
+                remark =
+                "Swap Detected";
+            }
         }
+
+
+
+        output +=
+
+        preRadio.rru.padEnd(15) +
+
+        preRadio.product.padEnd(35) +
+
+        preRadio.serial.padEnd(25) +
+
+        postSerial.padEnd(25) +
+
+        remark +
+
+        "\n";
 
     });
 
